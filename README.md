@@ -1,8 +1,11 @@
 # Zemenay Enkutatash
 
 A one-page new year note sent to partner companies ahead of Meskerem 1, 2019 E.C.
-(11 September 2026). It never names the company reading it, so the same URL goes
-to the whole list.
+(11 September 2026).
+
+The letter at `/` names nobody, so one URL goes to the whole list. Alongside it
+sit a handful of named versions at `/<slug>`, where a partner's own logo takes
+the place of the word "You" in the hero. Each has its own QR code.
 
 ```bash
 npm run dev
@@ -57,17 +60,89 @@ that cannot be committed here. Put the file at `public/fonts/TAN-NIMBUS.woff2`
 then the stack falls through to Righteous, which carries a similar retro-deco
 weight.
 
+## The generic letter and the partner versions
+
+There are two kinds of page, and the difference between them is one line in the
+hero.
+
+**The generic letter, at `/`.** It names nobody: the lockup reads
+`Zemenay ✕ You`. This is the one that goes out to most companies, and because it
+names nobody, one link is safe to send to any number of them.
+
+**A partner version, at `/<slug>`.** Identical in every respect except that the
+partner's own mark replaces the word "You". Everything below the hero, the work,
+the video, the contact details, is the same page: `app/components/Letter.tsx` is
+shared, and the route just passes a partner through it.
+
+Partner versions carry `robots: noindex`, because they name a specific company
+and are meant to be reached from a QR code on something posted to that company
+rather than found by a stranger. The generic letter stays indexable.
+
+### Adding or changing a partner
+
+1. Drop the logo at `public/partners/<slug>.svg`. SVG is preferred; a PNG with
+   real transparency is fine. It gets knocked out to pure white, so only the
+   silhouette matters — set `keepColor` on the entry if a mark genuinely needs
+   its own colours and has the contrast to survive on the navy.
+2. Edit `app/data/partners.ts`.
+3. `npm run qr` to regenerate the codes.
+
+The ten entries currently in there are placeholders, and so are the ten marks in
+`public/partners/`, which `npm run logos` regenerates. They read "PARTNER 01"
+rather than borrowing a plausible company name on purpose: a page that looks
+like a finished announcement for a company Zemenay has not partnered with is not
+something you want sitting on a public URL. Swap the names in `partners.ts` and
+overwrite the SVGs as the real logos arrive.
+
+A slug whose logo file does not exist yet falls back to the company name set in
+the same tracked capitals, so partners can go live one at a time as their logos
+come in. The lookup happens on disk at build time, which is why a missing file
+becomes a deliberate fallback in the HTML rather than a broken image.
+
+Unknown slugs 404 rather than rendering. Without that, any path at the root of
+the site would produce a real-looking letter addressed to a company invented
+from the URL.
+
+## QR codes
+
+`npm run qr` writes eleven codes to `qr/` — one for the generic letter, one per
+partner — reading the list straight out of `partners.ts` so the codes can never
+drift from the routes that exist.
+
+| File | Use |
+| --- | --- |
+| `qr/<slug>.svg` | vector. Use this on anything printed. |
+| `qr/<slug>.png` | 1024px raster, for slides, email and messaging apps. |
+| `qr/contact-sheet.png` | every code with its destination printed underneath |
+
+Check the contact sheet before anything goes to print. Getting two codes crossed
+is the one mistake in this job that cannot be undone after posting.
+
+The codes are dark navy on white at error correction level M, which survives a
+fold or a scuff on a printed card while staying readable at small sizes. Do not
+invert them: nearly every scanner expects the dark modules to be the data.
+
+`qr/` is not committed. The codes are derived entirely from `partners.ts` and the
+site URL, so regenerating takes a second. Point them elsewhere with
+`SITE=https://example.com npm run qr`.
+
 ## The artwork
 
 `public/art/` is generated, not hand-made. `npm run art` rebuilds every file in
-it from two source folders: the announcement graphic in `D:/site_pics`
-(override with `ART_SRC`) and the illustration pack in
-`D:/Telegram Desktop/Adeweb Developer Africa` (override with `ART_PACK`).
+it from the fist cut-outs committed under `public/media/` and the illustration
+pack in `D:/Telegram Desktop/Adeweb Developer Africa` (override with
+`ART_PACK`).
 
-- **`fist-left.png` / `fist-right.png`** are cut out of the announcement graphic
-  by flood-filling the charcoal background inward from the border, then split on
-  the seam where the two fists meet. Butting them edge to edge rebuilds the
-  original drawing, which is how the hero assembles.
+- **`fist-left.png` / `fist-right.png`** are composed from the two supplied
+  cut-outs in `public/media/`. Those are separate drawings with their own
+  margins and widths, so the build trims each to its real content, crops both
+  through one shared vertical window so the fists sit at the same height, and
+  pads each on its outer edge to a common half-width. Butting the two halves
+  together then lands the knuckles exactly on the pair's centre line, which is
+  where the hero fires the impact ring and the flower burst. Stray specks left
+  by the masking are cleared first, since the trim measures the alpha bounding
+  box and one loose pixel near an edge would pad the crop and push the knuckles
+  off the seam.
 - **`adey.png` / `adey-blue.png`** are the falling flower in its own yellow and
   in Zemenay blue. The page hard-cuts between the two behind a white flash
   rather than running a CSS `hue-rotate`, which drags a saturated yellow through

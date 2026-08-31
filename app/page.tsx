@@ -1,19 +1,11 @@
-import { AdeyFall } from './components/AdeyFall';
-import { Closing } from './components/Closing';
-import { Hero } from './components/Hero';
-import { Projects } from './components/Projects';
-import { Presenter } from './components/Presenter';
-import { Services } from './components/Services';
+import { Letter } from './components/Letter';
 
+/**
+ * The generic letter, and the one that goes out to most companies. It names
+ * nobody, so a single link is safe to send to any number of them.
+ *
+ * The personalised versions live at `/<slug>`; see `app/[partner]/page.tsx`.
+ */
 export default function Page() {
-  return (
-    <main className="relative">
-      <AdeyFall />
-      <Hero />
-      <Services />
-      <Projects />
-      <Presenter />
-      <Closing />
-    </main>
-  );
+  return <Letter />;
 }

@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import type { Partner } from '../data/partners';
+import { findLogo } from '../data/logo';
 
 /**
  * The opening. PARTNERSHIP comes out of the screen at the viewer, then two
@@ -9,8 +11,9 @@ import Image from 'next/image';
  * All of it is CSS keyframes over server-rendered markup, so it plays on the
  * first painted frame instead of waiting for hydration.
  *
- * The note deliberately never names the company reading it. This page goes out
- * to every partner on the list, so the second party is always "you".
+ * The generic letter names nobody: the lockup reads "Zemenay ✕ You", so one
+ * link can go to every company on the list. A partner version passes `partner`
+ * and their mark takes the place of the word.
  */
 
 // One shared clock, so the burst, the ring and the note stay in step if the
@@ -43,7 +46,7 @@ const BURST: [string, string, string, number, number][] = [
   ['14rem', '2.5rem', '190deg', 19, 0.05],
 ];
 
-export function Hero() {
+export function Hero({ partner }: { partner?: Partner }) {
   return (
     <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 py-[clamp(2.5rem,8vh,5rem)]">
       <div
@@ -78,6 +81,10 @@ export function Hero() {
           መልካም አዲስ ዓመት
         </p>
 
+        {/* The lockup. On the generic letter the second party is the word
+            "You", which is what lets one link go to every company on the list.
+            A partner version swaps in their own mark at the same optical size,
+            so the line reads as the two companies side by side. */}
         <p
           className="dg mt-4 flex items-center gap-[clamp(0.75rem,3vw,1.5rem)] text-[clamp(0.72rem,2.2vw,0.95rem)] tracking-[0.28em] text-ink-2 uppercase"
           style={{ animation: `rise 0.8s ease-out ${T.headline + 0.9}s both` }}
@@ -86,18 +93,20 @@ export function Hero() {
           <span aria-hidden className="text-gold">
             &#10005;
           </span>
-          <span>You</span>
+          {partner ? <PartnerMark partner={partner} /> : <span>You</span>}
         </p>
       </div>
 
-      {/* The bump. The two halves were cut from one drawing along the same
-          seam, so butting them edge to edge rebuilds the original image. */}
+      {/* The bump. The build step trims both drawings and pads each on its
+          outer edge to a common half-width, so butting the two halves together
+          lands the knuckles exactly on this container's centre line, which is
+          where the ring and the flower burst below are anchored. */}
       <div className="pointer-events-none relative mt-[clamp(1rem,3vh,2.5rem)] flex w-[var(--pair)] shrink-0 justify-center">
         <Image
           src="/art/fist-left.png"
           alt="Two fists meeting in a bump"
-          width={676}
-          height={578}
+          width={968}
+          height={722}
           loading="eager"
           fetchPriority="high"
           className="w-1/2"
@@ -106,8 +115,8 @@ export function Hero() {
         <Image
           src="/art/fist-right.png"
           alt=""
-          width={676}
-          height={578}
+          width={968}
+          height={722}
           loading="eager"
           fetchPriority="high"
           className="w-1/2"
@@ -162,5 +171,45 @@ export function Hero() {
         <p className="overline mt-3 text-ink-3">From everyone at Zemenay</p>
       </div>
     </section>
+  );
+}
+
+/**
+ * A partner's logo in the hero lockup, standing where "You" does on the generic
+ * letter.
+ *
+ * The file is looked up on disk at build time rather than guessed at, so a
+ * partner whose logo has not been supplied yet falls back to their name set in
+ * the same tracked capitals. That keeps a half-filled partner list shipping a
+ * plainer page instead of a broken image, which matters because these links go
+ * out one at a time as each logo arrives.
+ */
+function PartnerMark({ partner }: { partner: Partner }) {
+  const logo = findLogo(partner.slug);
+
+  if (!logo) {
+    return <span>{partner.name}</span>;
+  }
+
+  return (
+    // A plain <img>: the source is an arbitrary partner-supplied file, and
+    // next/image would need dangerouslyAllowSVG turned on for the whole site to
+    // handle the SVGs most brand kits ship. The height is fixed and the width
+    // is auto, so there is no layout shift to protect against either.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={logo}
+      alt={partner.name}
+      // Knocked out to pure white unless the mark asks to keep its colours.
+      // brightness(0) crushes any artwork to black whatever it started as, and
+      // invert(1) lifts that to white, so every logo lands at the same weight
+      // against the navy no matter what it looked like going in.
+      // Taller than the tracked capitals beside it on purpose: a logo lockup
+      // needs roughly twice the cap height of set type to carry the same weight
+      // on the line, or it reads as a footnote next to ZEMENAY.
+      className={`h-[clamp(1.3rem,4vw,2rem)] w-auto ${
+        partner.keepColor ? '' : 'brightness-0 invert'
+      }`}
+    />
   );
 }

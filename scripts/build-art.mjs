@@ -1,10 +1,10 @@
 /**
- * Turns the raw source photos in D:/site_pics into the web assets under
- * public/art. Run with `npm run art`. The outputs are committed, so this only
- * needs re-running when a source image changes.
+ * Turns the raw source artwork into the web assets under public/art. Run with
+ * `npm run art`. The outputs are committed, so this only needs re-running when
+ * a source image changes.
  *
  * Sources:
- *   gesture.jpg      the fist-bump announcement graphic the hero art comes from
+ *   public/media/left.png, right.png   the two fists, already cut out
  * and the illustration pack in ART_PACK:
  *   3.png  the woman standing in the adey abeba
  *   4.png  a drift of small blue flowers
@@ -15,7 +15,6 @@
 import sharp from 'sharp';
 import { mkdirSync } from 'node:fs';
 
-const SRC = process.env.ART_SRC || 'D:/site_pics';
 // The commissioned illustration pack: cut-out flowers, fields and the figure.
 const PACK = process.env.ART_PACK || 'D:/Telegram Desktop/Adeweb Developer Africa';
 const OUT = new URL('../public/art/', import.meta.url).pathname.replace(/^\//, '');
@@ -25,82 +24,138 @@ const log = (name, r) =>
   console.log(`  ${name.padEnd(20)} ${r.width}x${r.height}  ${(r.size / 1024).toFixed(0)}kb`);
 
 /* ── 1. The two fists ───────────────────────────────────────────────────────
-   The artwork sits on flat charcoal. A luminance key would eat the
-   illustration's own black outlines, so we flood fill inward from the border
-   instead: only charcoal CONNECTED to an edge goes transparent, and dark
-   pixels enclosed by the drawing survive. */
+   The hero pair, composed from the two supplied cut-outs in public/media/.
+
+   Those arrive as separate drawings with their own margins and their own
+   widths, so they cannot simply be dropped into the page side by side: the
+   knuckles would meet wherever the transparent padding happened to put them.
+   They are trimmed to their real content, cropped through one shared vertical
+   window so both fists sit at the same height, and then each is padded on its
+   OUTER edge to a common half-width. Butting the two exported halves together
+   therefore lands the knuckles exactly on the pair's centre line, which is
+   where the hero fires the impact ring and the flower burst.
+
+   Reading the sources out of public/ rather than a folder on one machine means
+   `npm run art` reproduces the hero from the repository alone. */
 async function fists() {
-  const REGION = { left: 0, top: 424, width: 676, height: 289 };
-  const SEAM = 338; // x inside the region where the two fists meet
-  const BG = [36, 32, 33];
-  // Total per-channel distance that still counts as background. Deliberately
-  // tight: the fists' own near-black shading touches the charcoal at the wrist,
-  // so anything looser floods through and punches holes in the hands.
-  const TOL = 18;
   const SCALE = 2; // export at 2x so the hero stays crisp on retina
+  const IN = new URL('../public/media/', import.meta.url).pathname.replace(/^\//, '');
 
-  const { data, info } = await sharp(`${SRC}/gesture.jpg`)
-    .extract(REGION)
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  const { width: W, height: H, channels: C } = info;
+  // Anything fainter than this is cut-out fringing rather than drawing, and
+  // including it would pad the trim with a halo of near-invisible pixels.
+  const OPAQUE = 40;
 
-  const isBg = (i) =>
-    Math.abs(data[i] - BG[0]) + Math.abs(data[i + 1] - BG[1]) + Math.abs(data[i + 2] - BG[2]) <= TOL;
+  const load = async (name) => {
+    const { data, info } = await sharp(`${IN}${name}.png`)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const { width: w, height: h } = info;
 
-  const alpha = new Uint8Array(W * H).fill(255);
-  const seen = new Uint8Array(W * H);
-  const stack = [];
-  const push = (x, y) => {
-    const p = y * W + x;
-    if (seen[p] || !isBg(p * C)) return;
-    seen[p] = 1;
-    stack.push(p);
+    // Label every connected blob of drawing, keep the biggest, erase the rest.
+    // Cut-outs arrive with stray specks left behind by whoever masked them, and
+    // those are worse than cosmetic here: the trim below measures the alpha
+    // bounding box, so one stray pixel out near an edge silently pads the crop
+    // and pushes the knuckles away from the seam. A fist is a single connected
+    // shape, so nothing real is ever lost by dropping the smaller blobs.
+    const solid = (p) => data[p * 4 + 3] > OPAQUE;
+    const label = new Int32Array(w * h).fill(-1);
+    let biggest = -1;
+    let biggestArea = 0;
+    let next = 0;
+
+    for (let seed = 0; seed < w * h; seed++) {
+      if (label[seed] !== -1 || !solid(seed)) continue;
+      const id = next++;
+      const stack = [seed];
+      label[seed] = id;
+      let area = 0;
+      const visit = (q) => {
+        if (label[q] !== -1 || !solid(q)) return;
+        label[q] = id;
+        stack.push(q);
+      };
+      while (stack.length) {
+        const p = stack.pop();
+        area++;
+        const x = p % w;
+        const y = (p / w) | 0;
+        if (x > 0) visit(p - 1);
+        if (x < w - 1) visit(p + 1);
+        if (y > 0) visit(p - w);
+        if (y < h - 1) visit(p + w);
+      }
+      if (area > biggestArea) {
+        biggestArea = area;
+        biggest = id;
+      }
+    }
+
+    let cleared = 0;
+    let x0 = w, x1 = -1, y0 = h, y1 = -1;
+    for (let p = 0; p < w * h; p++) {
+      if (label[p] === -1) continue;
+      if (label[p] !== biggest) {
+        data[p * 4 + 3] = 0;
+        cleared++;
+        continue;
+      }
+      const x = p % w;
+      const y = (p / w) | 0;
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+    if (cleared) console.log(`  (${name}: cleared ${cleared} stray px)`);
+
+    return { name, data, w, h, x0, x1, y0, y1 };
   };
-  for (let x = 0; x < W; x++) { push(x, 0); push(x, H - 1); }
-  for (let y = 0; y < H; y++) { push(0, y); push(W - 1, y); }
-  while (stack.length) {
-    const p = stack.pop();
-    alpha[p] = 0;
-    const x = p % W, y = (p / W) | 0;
-    if (x > 0) push(x - 1, y);
-    if (x < W - 1) push(x + 1, y);
-    if (y > 0) push(x, y - 1);
-    if (y < H - 1) push(x, y + 1);
-  }
 
-  // Feather the cutout: blurring the mask alone (never the colour) removes the
-  // jaggies the hard fill leaves, and the contrast curve pulls the resulting
-  // halo back in so the fists do not glow against the deep blue page.
-  // toColourspace('b-w') is load-bearing here. Sharp otherwise promotes a
-  // 1-channel raw input to 3-channel sRGB on output, and reading that back one
-  // byte per pixel shears the mask diagonally against the colour data.
-  const mask = await sharp(Buffer.from(alpha), { raw: { width: W, height: H, channels: 1 } })
-    .blur(1.1)
-    .linear(1.6, -76)
-    .toColourspace('b-w')
-    .raw()
-    .toBuffer();
+  const left = await load('left');
+  const right = await load('right');
 
-  const rgba = Buffer.alloc(W * H * 4);
-  for (let p = 0; p < W * H; p++) {
-    rgba[p * 4] = data[p * C];
-    rgba[p * 4 + 1] = data[p * C + 1];
-    rgba[p * 4 + 2] = data[p * C + 2];
-    rgba[p * 4 + 3] = mask[p];
-  }
+  // One vertical window for both, so their existing alignment is preserved
+  // rather than each being trimmed to its own top edge and drifting apart.
+  const top = Math.min(left.y0, right.y0);
+  const bottom = Math.max(left.y1, right.y1);
+  const height = bottom - top + 1;
 
-  // Both halves keep the full region height and split exactly on the seam, so
-  // the two <img> elements reassemble into the original drawing when their
-  // inner edges touch.
-  for (const [name, box] of [
-    ['fist-left', { left: 0, top: 0, width: SEAM, height: H }],
-    ['fist-right', { left: SEAM, top: 0, width: W - SEAM, height: H }],
+  const leftW = left.x1 - left.x0 + 1;
+  const rightW = right.x1 - right.x0 + 1;
+  const halfW = Math.max(leftW, rightW);
+
+  for (const [name, src, box, offset] of [
+    // The left fist's knuckles are its right edge, so it is pushed flush right
+    // against the seam; the right fist's are its left edge, so it sits flush
+    // left. The padding goes on the far side in each case.
+    ['fist-left', left, { left: left.x0, top, width: leftW, height }, halfW - leftW],
+    ['fist-right', right, { left: right.x0, top, width: rightW, height }, 0],
   ]) {
-    const r = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })
+    const cut = await sharp(src.data, { raw: { width: src.w, height: src.h, channels: 4 } })
       .extract(box)
-      .resize({ width: box.width * SCALE, kernel: 'lanczos3' })
-      .png({ compressionLevel: 9, palette: true, quality: 92 })
+      .png()
+      .toBuffer();
+
+    // Two passes, and it has to be two: sharp runs resize BEFORE composite
+    // within a single pipeline, so chaining them here would enlarge the empty
+    // canvas first and then paste the fist into it at its original size,
+    // leaving the drawing sitting in one corner at half scale.
+    const placed = await sharp({
+      create: {
+        width: halfW,
+        height,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    })
+      .composite([{ input: cut, left: offset, top: 0 }])
+      .png()
+      .toBuffer();
+
+    const r = await sharp(placed)
+      .resize({ width: halfW * SCALE, kernel: 'lanczos3' })
+      .png({ compressionLevel: 9 })
       .toFile(`${OUT}${name}.png`);
     log(`${name}.png`, r);
   }
