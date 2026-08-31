@@ -1,15 +1,20 @@
 /**
  * The work shown in the second section, one card each.
  *
- * TO FILL THIS IN
- *   1. Edit the six entries below, or add and remove entries freely. The grid
- *      reflows for any count.
- *   2. Drop a photo for each at  public/projects/<id>.(jpg|png|webp)  and set
- *      `image` to that path. Landscape works best: the card crops to 16:10 and
- *      the shot is centred, so keep the subject away from the very edges.
- *   3. Anything left without an `image` renders a labelled empty frame naming
- *      the file it is waiting for, so a half-filled deck still looks deliberate
- *      rather than broken.
+ * Adding or changing one:
+ *   1. Edit the entries below. Add and remove freely, the grid reflows for any
+ *      count.
+ *   2. Drop the media at  public/projects/<id>.(jpg|png|webp|mp4)  and point
+ *      `image` at it. The shot is centre-cropped, so keep the subject away from
+ *      the very edges. The FIRST entry renders as the wide feature card and
+ *      crops to 16:9, so give that one a landscape shot; the rest crop to 4:5
+ *      and suit portrait or square originals.
+ *   3. `video` is optional and takes precedence over `image` when both are set,
+ *      playing muted and looping in the card. Keep `image` alongside it as the
+ *      fallback for anything that will not play the file.
+ *   4. Anything left without usable media falls back to its index numeral at
+ *      full bleed and names the file it is waiting for, so a half-filled deck
+ *      still looks deliberate rather than broken.
  *
  * `tag` is the small chip over the photo. `detail` and `points` only appear once
  * the card is opened, so they can carry the substance the blurb has no room for.
