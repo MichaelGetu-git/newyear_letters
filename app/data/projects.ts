@@ -23,68 +23,96 @@ export type Project = {
   detail: string;
   points: string[];
   image?: string;
+  video?: string;
   href?: string;
 };
 
 export const PROJECTS: Project[] = [
   {
-    id: 'project-one',
-    title: 'Project one',
-    tag: 'Product',
-    blurb: 'One line on what it was and who it was for.',
-    detail:
-      'Two or three sentences on the problem, what we built, and what changed once it shipped. This only shows when the card is open, so it can afford to be specific.',
-    points: ['What we delivered', 'The stack it runs on', 'The outcome worth naming'],
-    image: '/projects/project-one.jpg',
-  },
-  {
-    id: 'project-two',
-    title: 'Project two',
-    tag: 'Platform',
-    blurb: 'One line on what it was and who it was for.',
-    detail:
-      'Two or three sentences on the problem, what we built, and what changed once it shipped.',
-    points: ['What we delivered', 'The stack it runs on', 'The outcome worth naming'],
-    image: '/projects/project-two.jpg',
-  },
-  {
-    id: 'project-three',
-    title: 'Project three',
-    tag: 'Web',
-    blurb: 'One line on what it was and who it was for.',
-    detail:
-      'Two or three sentences on the problem, what we built, and what changed once it shipped.',
-    points: ['What we delivered', 'The stack it runs on', 'The outcome worth naming'],
-    image: '/projects/project-three.jpg',
-  },
-  {
-    id: 'project-four',
-    title: 'Project four',
+    id: 'booking-app',
+    title: 'Booking | React Native',
     tag: 'Mobile',
-    blurb: 'One line on what it was and who it was for.',
-    detail:
-      'Two or three sentences on the problem, what we built, and what changed once it shipped.',
-    points: ['What we delivered', 'The stack it runs on', 'The outcome worth naming'],
-    image: '/projects/project-four.jpg',
+    blurb: 'Custom booking apps that help businesses manage appointments without manual scheduling.',
+    detail: 'Whether you run a salon, clinic, consultancy, rental service, or any appointment-based business, I\'ll design and develop a clean, easy-to-use booking system tailored to your needs.',
+    points: ['React Native', 'Mobile App', 'Scheduling', 'Google Maps'],
+    image: '/projects/booking-app.jpg',
+    video: '/projects/booking-app.mp4',
   },
   {
-    id: 'project-five',
-    title: 'Project five',
+    id: 'ev-industry',
+    title: 'EV Mechanic Finder',
+    tag: 'Mobile',
+    blurb: 'Helping EV drivers find mechanics they can trust with location-based search and in-app booking.',
+    detail: 'I built a React Native app with location-based search, mechanic profiles, and in-app booking to solve this. The app streamlines discovery for a niche market that lacked a dedicated trusted-mechanic directory.',
+    points: ['React Native', 'Firebase', 'Redux', 'API Integration'],
+    image: '/projects/ev-industry-app.jpg',
+    video: '/projects/ev-industry-app.mp4',
+  },
+  {
+    id: 'outsourcing-firm',
+    title: 'Outsourcing Firm Site',
+    tag: 'Web',
+    blurb: 'Designed, developed, and deployed a full website for an outsourcing and recruitment company.',
+    detail: 'Delivered a fast, responsive site built to represent an international client base and support lead generation, handling everything from design to deployment using Next.js and React.',
+    points: ['Next.js', 'React', 'API Integration', 'SEO Performance'],
+    image: '/projects/outsourcing-web.jpg',
+  },
+  {
+    id: 'travel-startup',
+    title: 'AI Trip Planner App',
     tag: 'AI',
-    blurb: 'One line on what it was and who it was for.',
-    detail:
-      'Two or three sentences on the problem, what we built, and what changed once it shipped.',
-    points: ['What we delivered', 'The stack it runs on', 'The outcome worth naming'],
-    image: '/projects/project-five.jpg',
+    blurb: 'An AI-powered trip planning and scheduling app that helps travelers find things to do nearby.',
+    detail: 'Combined React Native for the mobile experience with LLM integration to generate personalized, real-time itinerary suggestions for travelers passing through airports or cities.',
+    points: ['Next.js', 'Machine Learning', 'GraphQL', 'Firebase'],
+    image: '/projects/travel-web.jpg',
+    href: 'https://www.guidego.app/',
   },
   {
-    id: 'project-six',
-    title: 'Project six',
-    tag: 'Team',
-    blurb: 'One line on what it was and who it was for.',
-    detail:
-      'Two or three sentences on the problem, what we built, and what changed once it shipped.',
-    points: ['What we delivered', 'The stack it runs on', 'The outcome worth naming'],
-    image: '/projects/project-six.jpg',
+    id: 'saas-platform',
+    title: 'Dopebase Website',
+    tag: 'Web',
+    blurb: 'Built the full marketing website for Dopebase, a platform giving developers fast access to production-ready app templates.',
+    detail: 'Focused on clear conversion-driven messaging and a fast, responsive Next.js build to support the platform\'s developer audience.',
+    points: ['Next.js', 'React', 'Payment Gateway', 'SEO Writing'],
+    image: '/projects/saas-web.jpg',
   },
+  {
+    id: 'chewata-awaqi',
+    title: 'Chewata Awaqi Events',
+    tag: 'Web',
+    blurb: 'A vibrant gaming and events company that brings the digital world to life through immersive tournaments.',
+    detail: 'I built a fast, responsive website using Next.js, Tailwind CSS, ShadCN UI, and Prisma. The site features event listings, a media gallery, and dynamic content management.',
+    points: ['Next.js', 'React', 'UI/UX Prototyping', 'Agile Project Management'],
+    image: '/projects/chewata-event.jpg',
+  },
+  {
+    id: '3d-museum',
+    title: 'Interactive 3D Museum',
+    tag: 'Web',
+    blurb: 'A fully interactive 3D museum experience to explore immersive design, accessibility, and global usability.',
+    detail: 'Built as a personal project with Three.js for 3D rendering, multilingual support via i18next, and AI text-to-speech for accessibility.',
+    points: ['Three.js', 'AI Text-to-Speech', 'React', 'Modeling'],
+    image: '/projects/3d-museum.jpg',
+    href: 'https://vr-museum.vercel.app/',
+  },
+  {
+    id: 'dopebase-admin',
+    title: 'Dopebase Admin Panel',
+    tag: 'Platform',
+    blurb: 'Seamlessly managed users, analyzed data, and automated workflows for an open-source platform.',
+    detail: 'Built the administration panel with Next.js, Firebase, Auth0, and Tailwind CSS to handle the back-office operations of the platform.',
+    points: ['Next.js', 'Firebase', 'Tailwind CSS', 'Auth0'],
+    image: '/projects/dopebase-admin.jpg',
+    href: 'https://dopebase.com/',
+  },
+  {
+    id: 'instaflutter-docs',
+    title: 'Instaflutter Docs',
+    tag: 'Web',
+    blurb: 'A clean, developer-friendly documentation site using Docusaurus for prebuilt Flutter plugins.',
+    detail: 'Created structured guides, code examples, and search functionality—making plugin adoption smooth and efficient for developers of all levels.',
+    points: ['Next.js', 'File Documentation', 'Agile Software Development', 'Tailwind CSS'],
+    image: '/projects/instaflutter-doc.jpg',
+    href: 'https://dopebase.com/docs/flutter/getting-started-with-flutter',
+  }
 ];

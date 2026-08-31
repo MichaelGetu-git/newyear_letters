@@ -77,6 +77,7 @@ function Card({
   // icon behind. Tracking the failure lets the empty state name the file it is
   // waiting for, which is more use than a broken frame.
   const [imageFailed, setImageFailed] = useState(false);
+  const hasVideo = Boolean(project.video);
   const hasPhoto = Boolean(project.image) && !imageFailed;
   const number = String(index).padStart(2, '0');
 
@@ -90,9 +91,18 @@ function Card({
         className="block w-full cursor-pointer text-left"
       >
         <span
-          className={`relative block overflow-hidden ${feature ? 'aspect-[16/9]' : 'aspect-[4/5]'}`}
+          className={`relative block overflow-hidden ${feature ? 'aspect-video' : 'aspect-4/5'}`}
         >
-          {hasPhoto ? (
+          {hasVideo ? (
+            <video
+              src={project.video}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="card-media object-cover absolute inset-0 w-full h-full"
+            />
+          ) : hasPhoto ? (
             <Image
               src={project.image as string}
               alt={project.title}
@@ -135,9 +145,9 @@ function Card({
               <span className="mt-1.5 block text-[0.82rem] leading-relaxed text-ink-3">
                 {project.blurb}
               </span>
-              {!hasPhoto && (
+              {!hasPhoto && !hasVideo && (
                 <span className="mt-2 block text-[0.65rem] text-ink-3/70">
-                  photo goes at{' '}
+                  media goes at{' '}
                   <code className="text-cyan">
                     {project.image ?? `public/projects/${project.id}.jpg`}
                   </code>
