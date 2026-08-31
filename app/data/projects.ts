@@ -44,6 +44,16 @@ export const PROJECTS: Project[] = [
     video: '/projects/booking-app.mp4',
   },
   {
+    id: 'food-delivery-app',
+    title: 'Food Delivery | React Native',
+    tag: 'Mobile',
+    blurb: 'A full ordering flow for restaurants, from browsing the menu to paying, on one phone.',
+    detail:
+      'A React Native delivery app built on Firebase, covering the whole journey a hungry customer takes: browsing cuisines, building an order, signing in, saving a card, and paying without leaving the app. Firebase carries the accounts, the live order state, and the menu data, so a restaurant can change what it sells without waiting on a release.',
+    points: ['React Native', 'Firebase', 'Cart & checkout', 'Card payments'],
+    video: '/projects/food-delivery-app.mp4',
+  },
+  {
     id: 'ev-industry',
     title: 'EV Mechanic Finder',
     tag: 'Mobile',

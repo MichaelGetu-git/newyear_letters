@@ -90,8 +90,14 @@ function Card({
         aria-controls={`panel-${project.id}`}
         className="block w-full cursor-pointer text-left"
       >
+        {/* The feature card only earns its wide crop where it actually spans
+            two columns. On one column it is the same width as every other card,
+            so 16:9 just makes it a short letterbox stub above a full-height
+            neighbour. It matches the rest at 4:5 until the grid goes wide. */}
         <span
-          className={`relative block overflow-hidden ${feature ? 'aspect-video' : 'aspect-4/5'}`}
+          className={`relative block overflow-hidden ${
+            feature ? 'aspect-4/5 lg:aspect-video' : 'aspect-4/5'
+          }`}
         >
           {hasVideo ? (
             <video
@@ -120,7 +126,14 @@ function Card({
                falls back to the index numeral at full bleed, which still looks
                like a designed card in a deck that is only half filled. */
             <span className="card-media absolute inset-0 flex items-center justify-center bg-[radial-gradient(120%_80%_at_50%_0%,#004aad_0%,#00204f_70%)]">
-              <span className={`dg leading-none text-white/8 select-none ${feature ? 'text-[10rem]' : 'text-[7rem]'}`}>
+              {/* The oversized numeral belongs to the wide layout too. At one
+                  column the feature card is no bigger than its neighbours, so
+                  10rem simply overflowed it. */}
+              <span
+                className={`dg leading-none text-white/8 select-none ${
+                  feature ? 'text-[7rem] lg:text-[10rem]' : 'text-[7rem]'
+                }`}
+              >
                 {number}
               </span>
             </span>
@@ -139,7 +152,11 @@ function Card({
           {/* Title block, sitting on the photo. */}
           <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 px-5 pb-5">
             <span className="block">
-              <span className={`dg block leading-tight ${feature ? 'text-[1.75rem]' : 'text-[1.3rem]'}`}>
+              <span
+                className={`dg block leading-tight ${
+                  feature ? 'text-[1.3rem] lg:text-[1.75rem]' : 'text-[1.3rem]'
+                }`}
+              >
                 {project.title}
               </span>
               <span className="mt-1.5 block text-[0.82rem] leading-relaxed text-ink-3">

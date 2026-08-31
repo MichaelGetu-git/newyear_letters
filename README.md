@@ -18,17 +18,20 @@ plain `npm run dev`.
 
 ### 1. The projects
 
-Edit `app/data/projects.ts`. Six entries are seeded as placeholders. Add or
-remove freely, the grid reflows for any count.
+Edit `app/data/projects.ts`. Add and remove freely, the grid reflows for any
+count. Drop media into `public/projects/` and point `image` (or `video`, see
+below) at it.
 
-Drop a photo for each into `public/projects/` and point `image` at it. The photo
-is centre-cropped, so keep the subject away from the very edges. The first entry
-renders as the wide feature card at the top of the grid and crops to 16:9, so
-give that one a landscape shot; the rest crop to 4:5 and suit portrait or square
-originals.
+The first entry is the feature card. On a wide screen it spans two columns and
+crops to 16:9, so give it a landscape shot. Everything else crops to 4:5 and
+suits portrait or square originals. Below that two-column breakpoint the feature
+card is the same width as every other card, so it drops to 4:5 as well — a 16:9
+frame at one column is just a short letterbox stub sitting above a full-height
+neighbour.
 
-Any card without a usable photo falls back to its index numeral at full bleed
-and names the file it is waiting for, so a half-filled deck still looks
+Media is centre-cropped either way, so keep the subject away from the very
+edges. Any card without usable media falls back to its index numeral at full
+bleed and names the file it is waiting for, so a half-filled deck still looks
 deliberate rather than broken.
 
 ### 2. The services list
@@ -37,7 +40,22 @@ deliberate rather than broken.
 copy and links tracking the live pages on zemenaytech.com. Nothing to add here
 unless the offering set changes.
 
-### 3. The presenter video
+### 3. Project videos
+
+A card plays `video` when the entry has one, looping and muted, and ignores
+`image` entirely in that case. Compress anything new before committing it:
+
+```bash
+npm run video media-src/whatever.mp4 my-project-id
+```
+
+That writes `public/projects/my-project-id.mp4` at the same spec as the rest of
+the deck and strips the audio, which the cards never play. It matters: the first
+clip dropped in here was 37MB, more than twenty times the weight of everything
+else on the page, and came out at 1.9MB with no visible loss. Keep the master in
+`media-src/` — gitignored, so it is never deployed and never lost.
+
+### 4. The presenter video
 
 The clip is composited straight onto the blue, so it needs a real alpha channel.
 Two encodings are required, because Safari cannot decode alpha WebM and Chrome
@@ -52,7 +70,7 @@ cannot decode HEVC:
 Until both exist the section shows a panel saying so rather than a broken
 player.
 
-### 4. TAN Nimbus
+### 5. TAN Nimbus
 
 The hero word is meant to be set in TAN Nimbus, a licensed face from TAN Type
 that cannot be committed here. Put the file at `public/fonts/TAN-NIMBUS.woff2`

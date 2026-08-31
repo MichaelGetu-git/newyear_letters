@@ -44,3 +44,6 @@ next-env.d.ts
 
 # generated QR codes, rebuilt with `npm run qr`
 /qr/
+
+# full-resolution video masters, kept out of the deployment
+/media-src/
