@@ -43,17 +43,32 @@ unless the offering set changes.
 ### 3. Project videos
 
 A card plays `video` when the entry has one, looping and muted, and ignores
-`image` entirely in that case. Compress anything new before committing it:
+`image` entirely in that case. Always run a new clip through this rather than
+dropping the file straight in:
 
 ```bash
 npm run video media-src/whatever.mp4 my-project-id
 ```
 
-That writes `public/projects/my-project-id.mp4` at the same spec as the rest of
-the deck and strips the audio, which the cards never play. It matters: the first
-clip dropped in here was 37MB, more than twenty times the weight of everything
-else on the page, and came out at 1.9MB with no visible loss. Keep the master in
-`media-src/` — gitignored, so it is never deployed and never lost.
+Add `--wide` only for a clip going in the first slot, which spans two columns
+and crops to 16:9 on a wide screen.
+
+Two things it handles that matter more than the compression:
+
+**Shape.** The cards are 4:5 and fill with `object-cover`, so a 16:9 clip
+dropped straight in loses 55% of its width. For a promo cut with content out at
+the left and right edges, that means whole phone mockups disappear off the
+sides. The script scales the full frame to the card's width and pads it out to
+4:5 in the clip's own background colour, sampled from a real frame. Nothing is
+cropped, and because the pad matches the backdrop the join is invisible.
+
+**Weight.** Footage arrives at 1080p and several megabits with an audio track
+the cards can never play. The first clip dropped in here was 37MB on its own,
+more than twenty times everything else on the page put together; it came out at
+1.4MB with no visible loss.
+
+Keep the master in `media-src/` — gitignored, so it is never deployed and never
+lost.
 
 ### 4. The presenter video
 
