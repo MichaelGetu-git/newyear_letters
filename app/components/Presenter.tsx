@@ -24,7 +24,7 @@ const SRC = '/media/pm-intro';
 
 export function Presenter() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [missing, setMissing] = useState(false);
 
   // A <video> that lists its candidates as <source> children does not reliably
@@ -44,6 +44,37 @@ export function Presenter() {
       v.removeEventListener('error', check, true);
       clearTimeout(timer);
     };
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Attempt to play unmuted when in view
+            v.muted = false;
+            setMuted(false);
+            v.play().catch(() => {
+              // If the browser blocks unmuted autoplay (due to lack of interaction),
+              // gracefully fall back to muted playback.
+              v.muted = true;
+              setMuted(true);
+              v.play().catch(() => {});
+            });
+          } else {
+            // Pause the video when it leaves the viewport to save resources
+            v.pause();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(v);
+    return () => observer.disconnect();
   }, []);
 
   function toggleSound() {
@@ -97,8 +128,9 @@ export function Presenter() {
                   The clip is not in place yet
                 </p>
                 <p className="max-w-sm text-sm text-ink-3">
-                  Add <code className="text-cyan">pm-intro.webm</code> and{' '}
-                  <code className="text-cyan">pm-intro.mov</code> to{' '}
+                  Add <code className="text-cyan">pm-intro.webm</code>,{' '}
+                  <code className="text-cyan">pm-intro.mov</code>, or{' '}
+                  <code className="text-cyan">pm-intro.mp4</code> to{' '}
                   <code className="text-cyan">public/media</code> and this panel
                   becomes the video.
                 </p>
@@ -108,9 +140,7 @@ export function Presenter() {
                 <video
                   ref={videoRef}
                   className="relative w-full"
-                  autoPlay
                   loop
-                  muted
                   playsInline
                   preload="auto"
                   poster="/media/pm-poster.png"
@@ -120,6 +150,7 @@ export function Presenter() {
                       and it cannot decode alpha WebM at all. */}
                   <source src={`${SRC}.mov`} type='video/quicktime; codecs="hvc1"' />
                   <source src={`${SRC}.webm`} type="video/webm" />
+                  <source src={`${SRC}.mp4`} type="video/mp4" />
                 </video>
 
                 <button
