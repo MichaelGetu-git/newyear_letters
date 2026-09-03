@@ -18,7 +18,18 @@
  * plainer page rather than a broken one.
  */
 export type Partner = {
-  /** URL segment, and the logo filename. Lowercase, hyphens only. */
+  /**
+   * URL segment, and the logo filename. Lowercase, hyphens only.
+   *
+   * TREAT THIS AS PERMANENT once codes have been printed. The slug is what the
+   * QR encodes, so renaming one silently breaks every card already posted with
+   * it, and there is no fixing that after the fact.
+   *
+   * This is why the slugs are numbered rather than named after companies: the
+   * `name` and the logo can be filled in or swapped at any point without
+   * touching the URL, so codes can go to print before the partner list is
+   * final. Assign a slug to a company and leave it assigned.
+   */
   slug: string;
   /** The company's name, used for the tab title and the image alt text. */
   name: string;
@@ -31,7 +42,7 @@ export type Partner = {
   keepColor?: boolean;
 };
 
-export const PARTNERS: Partner[] = Array.from({ length: 10 }, (_, i) => {
+export const PARTNERS: Partner[] = Array.from({ length: 12 }, (_, i) => {
   const n = String(i + 1).padStart(2, '0');
   return { slug: `partner-${n}`, name: `Partner ${n}` };
 });

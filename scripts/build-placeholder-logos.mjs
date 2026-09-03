@@ -31,6 +31,8 @@ const MARKS = [
   '<rect x="6" y="6" width="12" height="12" fill="#fff"/><rect x="22" y="6" width="12" height="12" fill="#fff"/><rect x="6" y="22" width="12" height="12" fill="#fff"/>',
   '<path d="M20 4 A16 16 0 0 1 20 36 A8 8 0 0 1 20 20 A8 8 0 0 0 20 4" fill="#fff"/>',
   '<path d="M8 20 Q20 4 32 20 Q20 36 8 20 Z" fill="none" stroke="#fff" stroke-width="4"/>',
+  '<path d="M20 6 L34 20 L20 34 L6 20 Z" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/><circle cx="20" cy="20" r="4" fill="#fff"/>',
+  '<path d="M10 8 V32 M20 14 V32 M30 6 V32" stroke="#fff" stroke-width="4" stroke-linecap="round"/>',
 ];
 
 for (let i = 0; i < MARKS.length; i++) {
