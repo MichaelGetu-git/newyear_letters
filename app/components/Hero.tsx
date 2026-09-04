@@ -211,16 +211,15 @@ function PartnerMark({ partner }: { partner: Partner }) {
     <img
       src={logo}
       alt={partner.name}
-      // Knocked out to pure white unless the mark asks to keep its colours.
-      // brightness(0) crushes any artwork to black whatever it started as, and
-      // invert(1) lifts that to white, so every logo lands at the same weight
-      // against the navy no matter what it looked like going in.
+      // No CSS filter here. The white knockout is baked into the file by
+      // `npm run partner-logos`, because Tailwind composes `filter` through
+      // @property-registered variables and on a browser without that support
+      // the declaration resolves to nothing — which left these near-black marks
+      // showing raw on the navy.
       // Taller than the tracked capitals beside it on purpose: a logo lockup
       // needs roughly twice the cap height of set type to carry the same weight
-      // on the line, or it reads as a footnote next to ZEMENAY.
-      className={`h-[clamp(1.3rem,4vw,2rem)] w-auto ${
-        partner.keepColor ? '' : 'brightness-0 invert'
-      }`}
+      // on the line, or it reads as a footnote next to the wordmark.
+      className="h-[clamp(1.3rem,4vw,2rem)] w-auto"
     />
   );
 }

@@ -19,6 +19,7 @@
  */
 import sharp from 'sharp';
 import { mkdirSync, readFileSync } from 'node:fs';
+import { PARTNERS as PARTNER_DATA } from '../app/data/partners.ts';
 
 const SRC = process.env.LOGO_SRC || 'D:/Telegram Desktop/Logos/Logos';
 const OUT = new URL('../public/partners/', import.meta.url).pathname.replace(/^\//, '');
@@ -108,6 +109,27 @@ for (const [slug, file, opts = {}] of PARTNERS) {
       if (data[p] === 0) continue;
       const lifted = (data[p] / 255) ** ALPHA_GAMMA * 255 * boost;
       data[p] = Math.min(255, Math.round(lifted));
+    }
+    art = await sharp(data, { raw: info }).png().toBuffer();
+  }
+
+  // Paint it white HERE rather than leaving the page to do it with a CSS
+  // filter. Tailwind composes `filter` through @property-registered custom
+  // properties, and on a browser without that support the whole declaration
+  // resolves to nothing — so the filter silently does not apply and the raw
+  // artwork shows through. Most of these marks are near-black (ALX averages
+  // 27,29,40; Guzo 19,19,19), so the failure mode is a black logo on a navy
+  // page. Baking the colour in cannot fail anywhere, and it makes the site
+  // match the story cards, which already do exactly this.
+  const keepColor = PARTNER_DATA.find((p) => p.slug === slug)?.keepColor;
+  if (!keepColor) {
+    const { data, info } = await sharp(art).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    for (let p = 0; p < data.length; p += 4) {
+      if (data[p + 3] > 0) {
+        data[p] = 255;
+        data[p + 1] = 255;
+        data[p + 2] = 255;
+      }
     }
     art = await sharp(data, { raw: info }).png().toBuffer();
   }
