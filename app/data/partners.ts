@@ -42,10 +42,23 @@ export type Partner = {
   keepColor?: boolean;
 };
 
-export const PARTNERS: Partner[] = Array.from({ length: 12 }, (_, i) => {
-  const n = String(i + 1).padStart(2, '0');
-  return { slug: `partner-${n}`, name: `Partner ${n}` };
-});
+export const PARTNERS: Partner[] = [
+  { slug: 'partner-01', name: 'Safaricom' },
+  { slug: 'partner-02', name: 'EthSwitch' },
+  { slug: 'partner-03', name: 'ALX' },
+  { slug: 'partner-04', name: 'Arifpay' },
+  // Its wordmark is black type sitting on a solid yellow dome, so the white
+  // knockout would turn both white and swallow the word. The yellow reads
+  // perfectly well against the navy on its own.
+  { slug: 'partner-05', name: 'Ride', keepColor: true },
+  { slug: 'partner-06', name: 'Zeleman' },
+  { slug: 'partner-07', name: 'Cactus' },
+  { slug: 'partner-08', name: 'Guzo Tech' },
+  { slug: 'partner-09', name: 'Noah Real Estate' },
+  { slug: 'partner-10', name: 'Hosea Real Estate' },
+  { slug: 'partner-11', name: 'Keste Damena' },
+  { slug: 'partner-12', name: 'The Talent Firm' },
+];
 
 export function findPartner(slug: string): Partner | undefined {
   return PARTNERS.find((p) => p.slug === slug);

@@ -19,9 +19,11 @@ export function Letter({ partner }: { partner?: Partner }) {
     <main className="relative">
       <AdeyFall />
       <Hero partner={partner} />
+      {/* What we do, then the presenter saying it in their own voice, then the
+          work that proves it. */}
       <Services />
-      <Projects />
       <Presenter />
+      <Projects />
       <Closing />
     </main>
   );

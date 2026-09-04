@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import type { Partner } from '../data/partners';
 import { findLogo } from '../data/logo';
+import { ShareButton } from './ShareButton';
+import { ZemenayLogo } from './ZemenayLogo';
 
 /**
  * The opening. PARTNERSHIP comes out of the screen at the viewer, then two
@@ -89,7 +91,10 @@ export function Hero({ partner }: { partner?: Partner }) {
           className="dg mt-4 flex items-center gap-[clamp(0.75rem,3vw,1.5rem)] text-[clamp(0.72rem,2.2vw,0.95rem)] tracking-[0.28em] text-ink-2 uppercase"
           style={{ animation: `rise 0.8s ease-out ${T.headline + 0.9}s both` }}
         >
-          <span>Zemenay</span>
+          {/* The real wordmark rather than the word set in Degular. It inherits
+              currentColor, so it sits at the same white as the type it replaced
+              and needs no separate knockout the way a partner's file does. */}
+          <ZemenayLogo className="h-[clamp(0.85rem,2.6vw,1.3rem)] w-auto" />
           <span aria-hidden className="text-gold">
             &#10005;
           </span>
@@ -169,6 +174,12 @@ export function Hero({ partner }: { partner?: Partner }) {
           next one, side by side.
         </p>
         <p className="overline mt-3 text-ink-3">From everyone at Zemenay</p>
+
+        {/* Only here, on the opening. This is the part worth posting, and the
+            story card it hands over is a picture of exactly this. */}
+        <div className="mt-6 flex justify-center">
+          <ShareButton partner={partner} />
+        </div>
       </div>
     </section>
   );

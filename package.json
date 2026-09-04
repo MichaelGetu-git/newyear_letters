@@ -10,7 +10,9 @@
     "art": "node scripts/build-art.mjs",
     "logos": "node scripts/build-placeholder-logos.mjs",
     "qr": "node --experimental-strip-types scripts/build-qr.mjs",
-    "video": "node scripts/build-video.mjs"
+    "video": "node scripts/build-video.mjs",
+    "partner-logos": "node scripts/build-partner-logos.mjs",
+    "share-cards": "node --experimental-strip-types scripts/build-share-cards.mjs"
   },
   "dependencies": {
     "next": "16.3.2",
