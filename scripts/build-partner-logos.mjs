@@ -67,9 +67,19 @@ const H = 160;
 // without starving the wide ones of height.
 const K = 0.3;
 const REF_ASPECT = 3; // a typical wordmark, and so the middle of the range
-const BASE_H = Math.round(H * 0.66);
-const MIN_H = Math.round(H * 0.44);
-const MAX_H = Math.round(H * 0.91);
+// The art fills most of its canvas. The canvas is what the page sets a height
+// on, so leaving slack in it shrinks the logo against the Zemenay wordmark
+// beside it: at 0.66 a typical partner mark rendered smaller than the wordmark
+// it is paired with, which read as the partner being the junior name.
+const BASE_H = Math.round(H * 0.8);
+const MIN_H = Math.round(H * 0.62);
+const MAX_H = Math.round(H * 0.97);
+
+// Anti-aliased edges and any half-opaque layer survive the page's white
+// knockout as grey rather than white, which on the navy reads as a smudge.
+// Lifting the mid-range of the alpha channel keeps the soft edges soft while
+// making the body of a stroke properly solid.
+const ALPHA_GAMMA = 0.7;
 
 for (const [slug, file, opts = {}] of PARTNERS) {
   const src = readFileSync(`${SRC}/${file}`);
@@ -89,13 +99,15 @@ for (const [slug, file, opts = {}] of PARTNERS) {
 
   // Applied AFTER the resize, which is the whole trick. These sources are up to
   // 3300px wide and come down by a factor of six, and downsampling averages a
-  // thin stroke against its transparent neighbours, so alpha boosted on the
-  // original is spent again on the way down. Correcting at final size is what
-  // actually holds.
-  if (opts.alphaBoost) {
+  // thin stroke against its transparent neighbours, so alpha corrected on the
+  // original is spent again on the way down. Fixing it at final size holds.
+  {
     const { data, info } = await sharp(art).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const boost = opts.alphaBoost ?? 1;
     for (let p = 3; p < data.length; p += 4) {
-      data[p] = Math.min(255, Math.round(data[p] * opts.alphaBoost));
+      if (data[p] === 0) continue;
+      const lifted = (data[p] / 255) ** ALPHA_GAMMA * 255 * boost;
+      data[p] = Math.min(255, Math.round(lifted));
     }
     art = await sharp(data, { raw: info }).png().toBuffer();
   }

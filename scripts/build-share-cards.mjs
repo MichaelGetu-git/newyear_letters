@@ -26,7 +26,6 @@ const LOGOS = new URL('../public/partners/', import.meta.url).pathname.replace(/
 const BRAND = new URL('../public/brand-zemenay.svg', import.meta.url).pathname.replace(/^\//, '');
 mkdirSync(OUT, { recursive: true });
 
-const SITE = (process.env.SITE || 'https://newyear-letters.vercel.app').replace(/\/$/, '');
 const W = 1080;
 const H = 1920;
 
@@ -68,9 +67,10 @@ const PETALS = [
   [300, 190, 46, 8], [760, 165, 52, -22],
 ];
 
-const cards = [{ slug: 'generic', name: null, url: `${SITE}/` }, ...PARTNERS.map((p) => ({
-  slug: p.slug, name: p.name, keepColor: p.keepColor, url: `${SITE}/${p.slug}`,
-}))];
+const cards = [
+  { slug: 'generic', name: null },
+  ...PARTNERS.map((p) => ({ slug: p.slug, name: p.name, keepColor: p.keepColor })),
+];
 
 for (const card of cards) {
   const layers = [];
@@ -138,7 +138,6 @@ for (const card of cards) {
     <text x="${W / 2}" y="470" text-anchor="middle" font-family="${LATIN}" font-size="30" letter-spacing="11" fill="#60a5fa">MESKEREM 1 &#183; 2019 E.C.</text>
     <text x="${W / 2}" y="640" text-anchor="middle" font-family="${LATIN}" font-size="132" font-weight="bold" letter-spacing="2" fill="#ffffff">PARTNERSHIP</text>
     <text x="${W / 2}" y="790" text-anchor="middle" font-family="${ETHIOPIC}" font-size="76" fill="#ffcd68">መልካም አዲስ ዓመት</text>
-    <text x="${W / 2}" y="1780" text-anchor="middle" font-family="${LATIN}" font-size="30" letter-spacing="3" fill="#93aee0">${card.url.replace(/^https?:\/\//, '')}</text>
   </svg>`;
   layers.push({ input: Buffer.from(text), left: 0, top: 0 });
 
